@@ -1,0 +1,68 @@
+# =========================================================
+# Workflow de Integración Continua (CI)
+# =========================================================
+# Este workflow ejecuta validaciones automáticas
+# cuando hay cambios en la rama principal.
+#
+# Funciones:
+# - Descargar el repositorio
+# - Instalar herramientas de lint
+# - Validar archivos Markdown
+# =========================================================
+
+# Nombre visible del workflow en GitHub Actions
+name: CI
+
+# =========================================================
+# Eventos que disparan el workflow
+# =========================================================
+on:
+
+  # Ejecutar al hacer push a main
+  push:
+    branches:
+      - main
+
+  # Ejecutar al crear o actualizar Pull Requests
+  pull_request:
+    branches:
+      - main
+
+  # Permite ejecutar manualmente desde GitHub
+  workflow_dispatch:
+
+# =========================================================
+# Trabajos (jobs)
+# =========================================================
+jobs:
+
+  # Nombre del job
+  build:
+
+    # Sistema operativo de la máquina virtual
+    runs-on: ubuntu-latest
+
+    # =====================================================
+    # Pasos del job
+    # =====================================================
+    steps:
+
+      # ---------------------------------------------------
+      # Descargar el código del repositorio
+      # ---------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------
+      # Instalar dependencias para lint de Markdown
+      # ---------------------------------------------------
+      - name: Install markdown lint tools
+        run: |
+          npm install remark-cli remark-preset-lint-consistent
+
+      # ---------------------------------------------------
+      # Ejecutar análisis de archivos Markdown
+      # ---------------------------------------------------
+      - name: Run markdown lint
+        run: |
+          npx remark . --use remark-preset-lint-consistent
