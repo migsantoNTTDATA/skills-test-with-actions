@@ -6,8 +6,8 @@
 #
 # Funciones:
 # - Descargar el repositorio
-# - Instalar herramientas de lint
-# - Validar archivos Markdown
+# - Instalar herramientas de lint para Python
+# - Validar código Python
 # =========================================================
 
 # Nombre visible del workflow en GitHub Actions
@@ -54,15 +54,25 @@ jobs:
         uses: actions/checkout@v4
 
       # ---------------------------------------------------
-      # Instalar dependencias para lint de Markdown
+      # Configurar Python
       # ---------------------------------------------------
-      - name: Install markdown lint tools
-        run: |
-          npm install remark-cli remark-preset-lint-consistent
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
       # ---------------------------------------------------
-      # Ejecutar análisis de archivos Markdown
+      # Instalar dependencias
       # ---------------------------------------------------
-      - name: Run markdown lint
+      - name: Install dependencies
         run: |
-          npx remark . --use remark-preset-lint-consistent
+          python -m pip install --upgrade pip
+          pip install flake8 pylint
+
+      # ---------------------------------------------------
+      # Ejecutar análisis de código Python
+      # ---------------------------------------------------
+      - name: Run linting
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          pylint **/*.py --exit-zero
